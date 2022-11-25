@@ -75,7 +75,7 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
         }
 
         if (item[childField]) {
-          onDefault(item[childField], autoSelectChilds);
+          onDefault(item[childField], autoSelectChilds && item.tick);
         }
       });
       reload();
