@@ -1,6 +1,6 @@
 {
   "name": "react-native-tree-checkbox",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A simple and elegant checkbox tree for React Native.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

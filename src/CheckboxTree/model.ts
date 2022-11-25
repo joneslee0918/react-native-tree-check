@@ -24,6 +24,7 @@ export interface CheckboxTreeProps {
   iconSize?: number;
   iconColor: string;
   data: any[];
+  keyField: string;
   textField: string;
   childField: string;
   autoSelectParents?: boolean;
