@@ -103,7 +103,6 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
         item[childField].map((child: any) => onTick(child));
       }
       reload();
-      console.log('tick');
     };
 
     const onUnTick = (item: any) => {
@@ -115,7 +114,6 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
         item[childField].map((child: any) => onUnTick(child));
       }
       reload();
-      console.log('unTick');
     };
 
     const showChild = (item: any) => {
@@ -127,6 +125,7 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
       setKey(Math.random());
       selectItem = [];
       selectItemTick(listData);
+      onSelectItem();
     };
 
     const selectItemTick = (data: any) => {
@@ -140,7 +139,7 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
       });
     };
 
-    useEffect(() => {
+    const onSelectItem = () => {
       const selectedItem = _.cloneDeep(selectItem).map((e: any) => {
         delete e.parent;
         delete e.childs;
@@ -149,6 +148,9 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
         return e;
       });
       props.onSelect(selectedItem);
+    }
+    useEffect(() => {
+      onSelectItem();
     }, [props]);
 
     const _renderIcon = (status: boolean) => {

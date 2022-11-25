@@ -1,10 +1,10 @@
 {
-  "name": "react-native-checkbox-tree-example",
+  "name": "react-native-tree-checkbox-example",
   "displayName": "CheckboxTree Example",
   "expo": {
-    "name": "react-native-checkbox-tree-example",
-    "slug": "react-native-checkbox-tree-example",
-    "description": "Example app for react-native-checkbox-tree",
+    "name": "react-native-tree-checkbox-example",
+    "slug": "react-native-tree-checkbox-example",
+    "description": "Example app for react-native-tree-checkbox",
     "privacy": "public",
     "version": "1.0.0",
     "platforms": [

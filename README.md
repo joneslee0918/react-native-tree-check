@@ -1,13 +1,13 @@
-## react-native-checkbox-tree
+## react-native-tree-checkbox
 A simple and elegant checkbox tree for React Native. Implemented using [react-native-vector-icons](https://github.com/oblador/react-native-vector-icons)
 
 ## Getting started
 ```js
-    npm install react-native-checkbox-tree --save
+    npm install react-native-tree-checkbox --save
 ```
 or
 ```js
-    yarn add react-native-checkbox-tree
+    yarn add react-native-tree-checkbox
 ```
 
 Now we need to install [react-native-vector-icons](https://github.com/oblador/react-native-vector-icons).
@@ -20,11 +20,11 @@ or
 ```
 
 #### Source code demo
-[react-native-template-components](https://github.com/hoaphantn7604/react-native-template-components) A beautiful template for React Native.
+[react-native-template-components](https://github.com/upmanager/react-native-template-components) A beautiful template for React Native.
 
 ### Demo
-![](https://github.com/hoaphantn7604/file-upload/blob/master/document/checkboxtree/demo1.gif)
-![](https://github.com/hoaphantn7604/file-upload/blob/master/document/checkboxtree/demo2.gif)
+![](https://github.com/upmanager/file-upload/blob/master/document/checkboxtree/demo1.gif)
+![](https://github.com/upmanager/file-upload/blob/master/document/checkboxtree/demo2.gif)
 
 #### Props
 
@@ -53,11 +53,11 @@ or
 | setSelectedItem    | The input value is the result returned from onSelect  |
 
 #### Example 1
-![](https://github.com/hoaphantn7604/file-upload/blob/master/document/checkboxtree/example1.png)
+![](https://github.com/upmanager/file-upload/blob/master/document/checkboxtree/example1.png)
 ```javascript
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import CheckboxTree from 'react-native-checkbox-tree';
+import CheckboxTree from 'react-native-tree-checkbox';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -220,11 +220,11 @@ const styles = StyleSheet.create({
 ```
 
 #### Example 2
-![](https://github.com/hoaphantn7604/file-upload/blob/master/document/checkboxtree/example2.png)
+![](https://github.com/upmanager/file-upload/blob/master/document/checkboxtree/example2.png)
 ```javascript
   import React from 'react';
   import { StyleSheet, View } from 'react-native';
-  import CheckboxTree from 'react-native-checkbox-tree';
+  import CheckboxTree from 'react-native-tree-checkbox';
   import AntDesign from 'react-native-vector-icons/AntDesign';
 
   const recursiveData = [

@@ -1,6 +1,6 @@
 {
-  "name": "react-native-checkbox-tree-example",
-  "description": "Example app for react-native-checkbox-tree",
+  "name": "react-native-tree-checkbox-example",
+  "description": "Example app for react-native-tree-checkbox",
   "version": "0.0.1",
   "private": true,
   "main": "index",

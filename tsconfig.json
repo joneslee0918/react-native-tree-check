@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "react-native-checkbox-tree": ["./src/index"]
+      "react-native-tree-checkbox": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
