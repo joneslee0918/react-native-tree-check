@@ -1,6 +1,6 @@
 {
   "name": "react-native-tree-checkbox",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple and elegant checkbox tree for React Native.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -25,7 +25,7 @@
     "test": "jest",
     "typescript": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "prepare": "bob build",
+    "prepare": "npx bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
     "pods": "cd example && pod-install --quiet",

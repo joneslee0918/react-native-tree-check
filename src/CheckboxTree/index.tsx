@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, { useEffect, useImperativeHandle, useState } from 'react';
+import React, { useImperativeHandle, useState } from 'react';
 import { FlatList, TouchableOpacity, View, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { styles } from './styles';
@@ -121,6 +121,17 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
       reload();
     };
 
+    const onSelectItem = () => {
+      const selectedItem = _.cloneDeep(selectItem).map((e: any) => {
+        delete e.parent;
+        delete e.childs;
+        delete e.show;
+        delete e.tick;
+        return e;
+      });
+      props.onSelect(selectedItem);
+    };
+
     const reload = () => {
       setKey(Math.random());
       selectItem = [];
@@ -138,20 +149,6 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
         }
       });
     };
-
-    const onSelectItem = () => {
-      const selectedItem = _.cloneDeep(selectItem).map((e: any) => {
-        delete e.parent;
-        delete e.childs;
-        delete e.show;
-        delete e.tick;
-        return e;
-      });
-      props.onSelect(selectedItem);
-    }
-    useEffect(() => {
-      onSelectItem();
-    }, [props]);
 
     const _renderIcon = (status: boolean) => {
       if (status) {
