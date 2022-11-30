@@ -27,6 +27,7 @@ export interface CheckboxTreeProps {
   keyField: string;
   textField: string;
   childField: string;
+  childCheckField?: string;
   autoSelectParents?: boolean;
   autoSelectChilds?: boolean;
   renderItem?: ({

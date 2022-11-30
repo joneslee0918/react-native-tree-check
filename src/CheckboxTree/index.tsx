@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, { useImperativeHandle, useState } from 'react';
+import React, { useEffect, useImperativeHandle, useState } from 'react';
 import { FlatList, TouchableOpacity, View, Text } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { styles } from './styles';
@@ -14,6 +14,7 @@ const defaultProps = {
 
 let selectItem: any[] = [];
 let defaultValue: any[] = [];
+let tmpDefaultValue: any[] = [];
 
 const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
   (props, ref) => {
@@ -22,6 +23,7 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
       keyField,
       textField,
       childField,
+      childCheckField,
       style,
       textStyle,
       iconColor = 'black',
@@ -35,16 +37,25 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
       renderItem,
     } = props;
 
-    const [listData] = useState<any[]>(_.cloneDeep(data));
+    const [listData, setListData] = useState<any[]>(_.cloneDeep(data));
     const [key, setKey] = useState(Math.random());
 
     useImperativeHandle(ref, () => {
-      return { clear, setSelectedItem };
+      return { clear, setSelectedItem, updateListData };
     });
+    useEffect(() => {
+      if (listData?.length > 0) onDefault(listData, false)
+    }, [listData])
+
 
     const clear = () => {
       onClear(listData);
     };
+
+    const updateListData = (data: any[], defaultData: any[]) => {
+      defaultValue = defaultData;
+      setListData(_.cloneDeep(data));
+    }
 
     const onClear = (items: any[]) => {
       items.map((item: any) => {
@@ -122,26 +133,39 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
       reload();
     };
 
+
+    const getIds = (tmp: any): any => {
+      if (!tmp) return;
+      if (Array.isArray(tmp)) {
+        return tmp.map((item: any) => {
+          const existsChild = childCheckField ? item[childCheckField] : item[childField]?.length > 0;
+          if (existsChild) {
+            return getIds(item);
+          }
+          return item[keyField];
+        })
+      }
+      return tmp[keyField];
+    }
+
     const onSelectItem = () => {
-      const selectedItem = _.cloneDeep(selectItem).map((e: any) => {
-        delete e.parent;
-        delete e.childs;
-        delete e.show;
-        delete e.tick;
-        return e;
-      });
+      var selectedItem = _.cloneDeep(selectItem);
+      selectedItem = getIds(selectedItem);
+      selectedItem = [...selectedItem, ...tmpDefaultValue]
       props.onSelect(selectedItem);
     };
 
-    const reload = () => {
+    const reload = _.throttle(() => {
       setKey(Math.random());
       selectItem = [];
+      tmpDefaultValue = _.cloneDeep(defaultValue);
       selectItemTick(listData);
       onSelectItem();
-    };
+    }, 500);
 
     const selectItemTick = (data: any) => {
       data.map((item: any) => {
+        tmpDefaultValue = tmpDefaultValue?.filter(dItem => dItem != item[keyField]);
         if (item.tick) {
           selectItem.push(item);
         }
