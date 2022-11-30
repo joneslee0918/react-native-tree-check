@@ -31,8 +31,10 @@ or
 | Props              | Params               | isRequire | Description                                                               |
 | ------------------ | -------------------- | --------- | ------------------------------------------------------------------------- |
 | data               | Array                | Yes       | Data is a plain array                                                     |
+| keyField           | String               | Yes       | Extract the key from the data item                                        |
 | textField          | String               | Yes       | Extract the lable from the data item                                      |
 | childField         | String               | Yes       | Extract the field children from the data item                             |
+| childCheckField    | String               | No        | Extract the child exists from the data item(default check child.length)   |
 | onSelect           | (item[])=> void      | Yes       | Selection callback                                                        |
 | style              | ViewStyle            | No        | Styling for container view                                                |
 | textStyle          | TextStyle            | No        | Styling for text                                                          |
@@ -50,7 +52,8 @@ or
 | API                | Description                                           |
 | ------------------ | ----------------------------------------------------- |
 | clear              | Refresh data                                          |
-| setSelectedItem    | The input value is the result returned from onSelect  |
+| setSelectedItem    | The input value is the array of items id              |
+| updateListData     | The input values are list data and selected ids array |
 
 #### Example 1
 ![](https://github.com/upmanager/file-upload/blob/master/document/checkboxtree/example1.png)
@@ -133,35 +136,26 @@ const recursiveData = [
 export interface Props {}
 
 const CheckboxTreeScreen: React.FC<Props> = _props => {
-  const [data] = useState<any[]>(recursiveData);
   const ref: any = useRef();
 
   useEffect(() => {
     if (ref && ref.current) {
-      ref.current.setSelectedItem([
-        {
-          shopReportName: 'Name 1',
-          shopCode: '00001',
-          shopType: '2',
-          shopId: 1,
-          shopName: 'Name 1',
-        },
-        {
-          shopReportName: 'Name 2',
-          shopCode: '00002',
-          shopType: '3',
-          shopId: 2,
-          shopName: 'Name 2',
-        },
-      ]);
+      ref.current.setSelectedItem([1, 2]);
     }
   }, [ref]);
+
+  useEffect(() => {
+    if (ref && ref.current) {
+      ref.current.updateListData(recursiveData, [1, 2]);
+    }
+  }, [recursiveData]);
 
   return (
     <View style={styles.container}>
       <CheckboxTree
         ref={ref}
-        data={data}
+        data={recursiveData}
+        keyField="shopId"
         textField="shopName"
         childField="childs"
         textStyle={{ color: 'black' }}
@@ -301,6 +295,7 @@ const styles = StyleSheet.create({
       <View style={styles.container}>
         <CheckboxTree
           data={recursiveData}
+          keyField="shopId"
           textField="shopName"
           childField="childs"
           textStyle={{ color: 'black' }}
