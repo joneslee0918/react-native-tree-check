@@ -65,7 +65,7 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
     const onDefault = (items: any[], tick: boolean = false) => {
       items.map((item: any) => {
         const check =
-          _.filter(defaultValue, (e: any) => e[keyField] === item[keyField])
+          _.filter(defaultValue, (e: any) => e === item[keyField])
             .length > 0;
         if (tick) {
           item.tick = true;
