@@ -24,6 +24,8 @@ export interface CheckboxTreeProps {
   iconSize?: number;
   iconColor: string;
   data: any[];
+  selectedData: any[];
+  showsData: any[];
   keyField: string;
   textField: string;
   childField: string;
@@ -39,4 +41,5 @@ export interface CheckboxTreeProps {
     onSelect,
   }: IRenderItem) => JSX.Element;
   onSelect: (data: any) => void;
+  onShow: (data: any) => void;
 }

@@ -12,14 +12,9 @@ const defaultProps = {
   iconColor: 'black',
 };
 
-let selectItem: any[] = [];
-let defaultValue: any[] = [];
-let tmpDefaultValue: any[] = [];
-
 const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
   (props, ref) => {
     const {
-      data,
       keyField,
       textField,
       childField,
@@ -37,143 +32,45 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
       renderItem,
     } = props;
 
-    const [listData, setListData] = useState<any[]>(_.cloneDeep(data));
-    const [key, setKey] = useState(Math.random());
+    const [listData, setListData] = useState<any[]>([]);
+    const [selectedData, setSelectedData] = useState<any[]>([]);
+    const [showsData, setShowsData] = useState<any[]>([]);
 
     useImperativeHandle(ref, () => {
-      return { clear, setSelectedItem, updateListData };
+      return { clear };
     });
+
     useEffect(() => {
-      if (listData?.length > 0) onDefault(listData, false)
-    }, [listData])
+      updateListData(props.data || [])
+    }, [props.data])
+
+    useEffect(() => {
+      updateSelectedData(props.selectedData || [])
+    }, [props.selectedData])
+
+    useEffect(() => {
+      updateShowsData(props.showsData || [])
+    }, [props.showsData])
+
+    useEffect(() => {
+      if (typeof props.onSelect == 'function') {
+        props.onSelect(selectedData);
+      }
+    }, [selectedData])
+
+    useEffect(() => {
+      if (typeof props.onShow == 'function') {
+        props.onShow(showsData)
+      }
+    }, [showsData])
+
 
 
     const clear = () => {
-      onClear(listData);
+      setSelectedData([])
+      setShowsData([])
     };
 
-    const updateListData = (data: any[], defaultData: any[]) => {
-      defaultValue = defaultData;
-      setListData(_.cloneDeep(data));
-    }
-
-    const onClear = (items: any[]) => {
-      items.map((item: any) => {
-        item.tick = false;
-        item.show = false;
-        if (item[childField]) {
-          onClear(item[childField]);
-        }
-      });
-      reload();
-    };
-
-    const setSelectedItem = (data: any[]) => {
-      defaultValue = data;
-      onDefault(listData, false);
-    };
-
-    const onDefault = (items: any[], tick: boolean = false) => {
-      items.map((item: any) => {
-        const check =
-          _.filter(defaultValue, (e: any) => e === item[keyField])
-            .length > 0;
-        if (tick) {
-          item.tick = true;
-        } else {
-          if (check) {
-            item.tick = true;
-          }
-        }
-
-        if (item[childField]) {
-          onDefault(item[childField], autoSelectChilds && item.tick);
-        }
-      });
-      reload();
-    };
-
-    const parent = (item: any) => {
-      if (item && item[childField]) {
-        const check = item[childField].filter((child: any) => !child.tick);
-        if (check.length === 0) {
-          item.tick = true;
-        } else {
-          item.tick = false;
-        }
-        parent(item.parent);
-        reload();
-      }
-    };
-
-    const onTick = (item: any) => {
-      item.tick = true;
-      if (autoSelectParents) {
-        parent(item.parent);
-      }
-      if (item[childField] && autoSelectChilds) {
-        item[childField].map((child: any) => onTick(child));
-      }
-      reload();
-    };
-
-    const onUnTick = (item: any) => {
-      item.tick = false;
-      if (autoSelectParents) {
-        parent(item.parent);
-      }
-      if (item[childField] && autoSelectChilds) {
-        item[childField].map((child: any) => onUnTick(child));
-      }
-      reload();
-    };
-
-    const showChild = (item: any) => {
-      item.show = !item.show;
-      reload();
-    };
-
-
-    const getIds = (tmp: any): any => {
-      if (!tmp) return;
-      if (Array.isArray(tmp)) {
-        return tmp.map((item: any) => {
-          const existsChild = childCheckField ? item[childCheckField] : item[childField]?.length > 0;
-          if (existsChild) {
-            return getIds(item);
-          }
-          return item[keyField];
-        })
-      }
-      return tmp[keyField];
-    }
-
-    const onSelectItem = () => {
-      var selectedItem = _.cloneDeep(selectItem);
-      selectedItem = getIds(selectedItem);
-      selectedItem = [...selectedItem, ...tmpDefaultValue]
-      props.onSelect(selectedItem);
-    };
-
-    const reload = _.throttle(() => {
-      setKey(Math.random());
-      selectItem = [];
-      tmpDefaultValue = _.cloneDeep(defaultValue);
-      selectItemTick(listData);
-      onSelectItem();
-    }, 500);
-
-    const selectItemTick = (data: any) => {
-      data.map((item: any) => {
-        tmpDefaultValue = tmpDefaultValue?.filter(dItem => dItem != item[keyField]);
-        if (item.tick) {
-          selectItem.push(item);
-        }
-        if (item[childField]) {
-          selectItemTick(item[childField]);
-        }
-      });
-    };
 
     const _renderIcon = (status: boolean) => {
       if (status) {
@@ -199,48 +96,117 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
       }
     };
 
+    const _exits = (list: any[], value: any) => {
+      const idx = list.indexOf(value[keyField]);
+      return idx >= 0;
+    }
+    const setParents = (tmpData: any) => {
+      tmpData[childField]?.map((item: any) => {
+        item.parent = tmpData;
+        item = setParents(item);
+        return item;
+      })
+      return tmpData;
+    }
+    const updateListData = (newData: any[]) => {
+      newData = newData.map(item => setParents(item));
+      setListData([...newData]);
+    }
+    const updateSelectedData = (newData: any[]) => {
+      let tmpData = _.uniq(newData);
+      setSelectedData([...tmpData]);
+    }
+    const updateShowsData = (newData: any[]) => {
+      let tmpData = _.uniq(newData);
+      setShowsData([...tmpData]);
+    }
+
+    const getIds = (list: any): any => {
+      var tmp: any[] = []
+      if (!list) return tmp;
+      if (Array.isArray(list)) {
+        list.map((item: any) => {
+          tmp.push(item[keyField])
+          const existsChild = childCheckField ? item[childCheckField] : item[childField]?.length > 0;
+          if (existsChild) {
+            const childs = getIds(item[childField])
+            tmp = [...tmp, ...childs]
+          };
+        })
+      }
+      return tmp;
+    }
+    const removeItem = (value: any) => {
+      const idx = selectedData.indexOf(value)
+      if (idx >= 0) selectedData.splice(idx, 1)
+    }
+    const parent = (item: any, isTick: boolean) => {
+      if (!item) return
+      if (item[childField]) {
+        if (isTick) {
+          const check = item[childField].filter((child: any) => !_exits(selectedData, child));
+          if (check.length === 0) selectedData.push(item[keyField])
+        } else {
+          removeItem(item[keyField])
+        }
+      }
+      parent(item.parent, isTick);
+    };
+
+    const onTick = (item: any) => {
+      var childs: any[] = [];
+      selectedData.push(item[keyField])
+      if (autoSelectParents) parent(item.parent, true);
+      if (autoSelectChilds) childs = getIds(item[childField]);
+
+      var tmp = [...selectedData, ...childs];
+      updateSelectedData(tmp);
+    };
+
+    const onUnTick = (item: any) => {
+      removeItem(item[keyField])
+      if (autoSelectParents) parent(item.parent, false);
+      if (autoSelectChilds) {
+        const childs = getIds(item[childField]);
+        childs.map((item: any) => removeItem(item))
+      }
+      updateSelectedData(selectedData)
+    };
+
+    const showChild = (item: any) => {
+      const openIndex = showsData.findIndex(dItem => dItem == item[keyField]);
+      var tmp = showsData;
+      if (openIndex >= 0) tmp.splice(openIndex, 1);
+      else tmp.push(item[keyField])
+      updateShowsData(tmp)
+    };
     const renderList = (item: any, childs: any, index: number) => {
-      if (!item.show) {
-        item.show = false;
-      }
-      if (!item.tick) {
-        item.tick = false;
-      }
+      const isTick = selectedData.findIndex(dItem => dItem == item[keyField]) >= 0;
+      const isOpen = showsData.findIndex(dItem => dItem == item[keyField]) >= 0;
+
       return (
         <View style={[styles.item, { marginLeft: iconSize }]} key={index}>
           {renderItem ? (
             renderItem({
               item: item,
-              isSelect: item.tick,
-              isOpen: item.show,
-              onOpen: () => {
-                showChild(item);
-              },
-              onClose: () => {
-                showChild(item);
-              },
-              onSelect: () => {
-                !item.tick ? onTick(item) : onUnTick(item);
-              },
+              isSelect: isTick,
+              isOpen: isOpen,
+              onOpen: () => showChild(item),
+              onClose: () => showChild(item),
+              onSelect: () => { isTick ? onUnTick(item) : onTick(item) }
             })
           ) : (
             <View style={styles.rowItem}>
               {childs && childs.length > 0 ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    showChild(item);
-                  }}
-                >
-                  {item.show ? (
-                    openIcon ? (
-                      openIcon
-                    ) : (
+                <TouchableOpacity onPress={() => showChild(item)}>
+                  {isOpen ? (
+                    openIcon ? openIcon
+                      :
                       <Ionicons
                         name="ios-remove"
                         size={iconSize}
                         color={iconColor}
                       />
-                    )
                   ) : closeIcon ? (
                     closeIcon
                   ) : (
@@ -257,15 +223,12 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
               <TouchableOpacity
                 style={styles.flex1}
                 onPress={() => {
-                  if (!item.tick) {
-                    onTick(item);
-                  } else {
-                    onUnTick(item);
-                  }
+                  if (isTick) onUnTick(item);
+                  else onTick(item);
                 }}
               >
                 <View style={styles.center}>
-                  {_renderIcon(item.tick)}
+                  {_renderIcon(isTick)}
                   <Text style={[styles.name, textStyle]} numberOfLines={3}>
                     {item[textField]}
                   </Text>
@@ -273,15 +236,10 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
               </TouchableOpacity>
             </View>
           )}
-          <View style={[!item.show && styles.height0]}>
+          {isOpen && <View style={[!isOpen && styles.height0]}>
             {childs &&
-              childs.map((data: any, index: number) => {
-                if (!data.parent) {
-                  data.parent = item;
-                }
-                return renderList(data, data[childField], index);
-              })}
-          </View>
+              childs.map((data: any, index: number) => renderList(data, data[childField], index))}
+          </View>}
         </View>
       );
     };
@@ -290,12 +248,9 @@ const CheckboxTreeComponent = React.forwardRef<any, CheckboxTreeProps>(
       <View style={[styles.container, style]}>
         <FlatList
           data={listData}
-          renderItem={({ item, index }) =>
-            renderList(item, item[childField], index)
-          }
+          renderItem={({ item, index }) => renderList(item, item[childField], index)}
           keyExtractor={(_item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
-          extraData={key}
         />
       </View>
     );
